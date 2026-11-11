@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { isPublicAddress, parseTarget } from "../src/safeFetch.js";
-import { extract } from "../src/extract.js";
+import { extract, metadata, links } from "../src/extract.js";
 
 let passed = 0;
 async function check(name, fn) {
@@ -44,6 +44,16 @@ await check("extracts markdown from a live page", async () => {
   assert.ok(r.wordCount > 5);
 });
 
+await check("metadata and links work on a live page", async () => {
+  const m = await metadata("https://www.iana.org/help/example-domains");
+  assert.match(m.title, /Example Domains/i);
+  assert.ok(m.favicon.startsWith("https://"));
+  const l = await links("https://www.iana.org/help/example-domains");
+  assert.ok(l.count > 5 && l.links.length === l.count);
+  assert.ok(l.links.every((x) => x.url.startsWith("http") && typeof x.internal === "boolean"));
+  assert.ok(l.links.some((x) => x.internal) );
+});
+
 // --- payment gate, against a real server process ---
 const PORT = 4599;
 const PAY_TO = "0x1111111111111111111111111111111111111111";
@@ -79,9 +89,21 @@ try {
     for (const p of ["/.well-known/x402", "/.well-known/x402.json"]) {
       const wk = await (await fetch(`${base}${p}`)).json();
       assert.equal(wk.version, 1);
-      assert.deepEqual(wk.resources, [`${base}/extract`]);
+      assert.deepEqual(wk.resources, [`${base}/extract`, `${base}/metadata`, `${base}/links`]);
     }
     assert.match(await (await fetch(`${base}/robots.txt`)).text(), /llms\.txt/);
+    assert.equal(api.paths["/metadata"].get["x-payment-info"].price.amount, "0.005");
+    assert.ok((await (await fetch(`${base}/sitemap.xml`)).text()).includes(`<loc>${base}/llms.txt</loc>`));
+    const html = await (await fetch(`${base}/`, { headers: { accept: "text/html,application/xhtml+xml,*/*;q=0.8" } })).text();
+    assert.ok(html.includes("<title>AgentExtract") && html.includes("/links?url"));
+    const key = "7b1e4c9a2f6d4e0b8a35c1d97f20e6b4";
+    assert.equal(await (await fetch(`${base}/${key}.txt`)).text(), key);
+    for (const p of ["/metadata", "/links"]) {
+      const r = await fetch(`${base}${p}?url=https%3A%2F%2Fexample.com`);
+      assert.equal(r.status, 402, p);
+      const a = JSON.parse(Buffer.from(r.headers.get("payment-required"), "base64").toString("utf8")).accepts[0];
+      assert.equal(String(a.amount), "5000", p);
+    }
     assert.equal((await fetch(`${base}/extract`)).status, 402, "probe without params must reach the 402");
   });
 

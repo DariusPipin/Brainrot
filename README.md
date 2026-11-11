@@ -5,7 +5,10 @@ page back as clean markdown. Each successful call costs **$0.01 in USDC**, paid
 automatically by the agent through the [x402](https://x402.org) protocol (HTTP 402).
 The money goes straight to your wallet; there is no middleman account holding it.
 
-100 paid calls = $1.
+There are also two cheaper endpoints at $0.005 each: `/metadata` (title, description,
+social card, feeds) and `/links` (every link on a page).
+
+100 paid `/extract` calls = $1.
 
 ## What is verified and what is not
 
@@ -61,7 +64,8 @@ With `NETWORK=base-sepolia` (the default) no keys are needed and payments use te
 |---|---|---|
 | `PAY_TO` | required | Wallet address that receives payments |
 | `NETWORK` | `base-sepolia` | `base-sepolia` (test) or `base` (real USDC) |
-| `PRICE` | `$0.01` | Price per successful call |
+| `PRICE` | `$0.01` | Price per successful `/extract` call |
+| `PRICE_LIGHT` | `$0.005` | Price per successful `/metadata` or `/links` call |
 | `CDP_API_KEY_ID`, `CDP_API_KEY_SECRET` | none | Required when `NETWORK=base` |
 | `FACILITATOR_URL` | none | Use a different x402 facilitator instead |
 | `PORT` | `4021` | Listening port |
