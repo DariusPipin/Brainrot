@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: agent-extract
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NETWORK
+        value: base
+      - key: PRICE
+        value: $0.01
+      - key: PAY_TO
+        sync: false
+      - key: CDP_API_KEY_ID
+        sync: false
+      - key: CDP_API_KEY_SECRET
+        sync: false

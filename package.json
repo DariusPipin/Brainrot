@@ -1,0 +1,28 @@
+{
+  "name": "agent-extract",
+  "version": "1.0.0",
+  "description": "Pay-per-call web-to-markdown API for AI agents (x402 / USDC)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node test/smoke.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@coinbase/x402": "^2.1.0",
+    "@mozilla/readability": "^0.6.0",
+    "@x402/core": "^2.30.0",
+    "@x402/evm": "^2.30.0",
+    "@x402/express": "^2.30.0",
+    "@x402/extensions": "^2.30.0",
+    "express": "^5.3.0",
+    "linkedom": "^0.18.15",
+    "turndown": "^7.2.5"
+  },
+  "engines": {
+    "node": ">=20.12"
+  }
+}
