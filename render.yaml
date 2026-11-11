@@ -8,7 +8,9 @@ services:
       - key: NETWORK
         value: base
       - key: PRICE
-        value: $0.01
+        value: $0.005
+      - key: PRICE_LIGHT
+        value: $0.002
       - key: PAY_TO
         sync: false
       - key: CDP_API_KEY_ID

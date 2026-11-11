@@ -22,8 +22,8 @@ const NETWORKS = {
 const PORT = Number(process.env.PORT || 4021);
 const PAY_TO = (process.env.PAY_TO || "").trim();
 const NETWORK = (process.env.NETWORK || "base-sepolia").trim();
-const PRICE = (process.env.PRICE || "$0.01").trim();
-const PRICE_LIGHT = (process.env.PRICE_LIGHT || "$0.005").trim();
+const PRICE = (process.env.PRICE || "$0.005").trim();
+const PRICE_LIGHT = (process.env.PRICE_LIGHT || "$0.002").trim();
 const { CDP_API_KEY_ID, CDP_API_KEY_SECRET, FACILITATOR_URL } = process.env;
 // Public, non-secret key that proves site ownership to IndexNow search engines.
 const INDEXNOW_KEY = "7b1e4c9a2f6d4e0b8a35c1d97f20e6b4";

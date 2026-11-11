@@ -92,7 +92,7 @@ try {
       assert.deepEqual(wk.resources, [`${base}/extract`, `${base}/metadata`, `${base}/links`]);
     }
     assert.match(await (await fetch(`${base}/robots.txt`)).text(), /llms\.txt/);
-    assert.equal(api.paths["/metadata"].get["x-payment-info"].price.amount, "0.005");
+    assert.equal(api.paths["/metadata"].get["x-payment-info"].price.amount, "0.002");
     assert.ok((await (await fetch(`${base}/sitemap.xml`)).text()).includes(`<loc>${base}/llms.txt</loc>`));
     const html = await (await fetch(`${base}/`, { headers: { accept: "text/html,application/xhtml+xml,*/*;q=0.8" } })).text();
     assert.ok(html.includes("<title>AgentExtract") && html.includes("/links?url"));
@@ -102,7 +102,7 @@ try {
       const r = await fetch(`${base}${p}?url=https%3A%2F%2Fexample.com`);
       assert.equal(r.status, 402, p);
       const a = JSON.parse(Buffer.from(r.headers.get("payment-required"), "base64").toString("utf8")).accepts[0];
-      assert.equal(String(a.amount), "5000", p);
+      assert.equal(String(a.amount), "2000", p);
     }
     assert.equal((await fetch(`${base}/extract`)).status, 402, "probe without params must reach the 402");
   });
