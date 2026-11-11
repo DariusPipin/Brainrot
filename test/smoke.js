@@ -71,6 +71,20 @@ try {
     assert.match(await (await fetch(`${base}/llms.txt`)).text(), /x402/);
   });
 
+  await check("discovery documents are served", async () => {
+    const api = await (await fetch(`${base}/openapi.json`)).json();
+    const op = api.paths["/extract"].get;
+    assert.deepEqual(op["x-payment-info"], { protocols: ["x402"], price: { mode: "fixed", currency: "USD", amount: "0.01" } });
+    assert.ok(op.responses["402"]);
+    for (const p of ["/.well-known/x402", "/.well-known/x402.json"]) {
+      const wk = await (await fetch(`${base}${p}`)).json();
+      assert.equal(wk.version, 1);
+      assert.deepEqual(wk.resources, [`${base}/extract`]);
+    }
+    assert.match(await (await fetch(`${base}/robots.txt`)).text(), /llms\.txt/);
+    assert.equal((await fetch(`${base}/extract`)).status, 402, "probe without params must reach the 402");
+  });
+
   await check("unpaid call gets HTTP 402 with correct payment requirements", async () => {
     const res = await fetch(`${base}/extract?url=https%3A%2F%2Fexample.com`, { headers: { accept: "application/json" } });
     assert.equal(res.status, 402);

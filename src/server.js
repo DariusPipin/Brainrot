@@ -81,6 +81,7 @@ app.get("/", (req, res) => {
     endpoints: {
       [`GET ${base}/extract?url={url}`]: `Paid (${PRICE} per call). Returns JSON: url, title, byline, excerpt, markdown, wordCount.`,
       [`GET ${base}/llms.txt`]: "Free. Plain-text usage guide for agents.",
+      [`GET ${base}/openapi.json`]: "Free. OpenAPI description with pricing.",
       [`GET ${base}/health`]: "Free. Liveness check.",
     },
     exampleOutput: EXAMPLE_OUTPUT,
@@ -111,6 +112,84 @@ app.get("/llms.txt", (req, res) => {
     ].join("\n"),
   );
 });
+
+// --- Machine-readable discovery, so crawlers and agent directories can index the service ---
+
+const publicBase = (req) => (process.env.PUBLIC_URL || `${req.protocol}://${req.get("host")}`).replace(/\/$/, "");
+
+app.get("/openapi.json", (req, res) => {
+  res.json({
+    openapi: "3.1.0",
+    info: {
+      title: "AgentExtract",
+      version: "1.0.0",
+      description: `${DESCRIPTION} Payment: ${PRICE} USDC per successful call via x402 on ${network.id}. Failed extractions are not charged.`,
+    },
+    servers: [{ url: publicBase(req) }],
+    paths: {
+      "/extract": {
+        get: {
+          operationId: "extractUrlToMarkdown",
+          summary: "Web page to clean markdown",
+          description: DESCRIPTION,
+          tags: ["web", "scraping", "markdown", "extraction"],
+          parameters: [
+            {
+              name: "url",
+              in: "query",
+              required: true,
+              description: "Absolute http(s) URL of the page to extract (URL-encoded).",
+              schema: { type: "string", format: "uri" },
+              example: "https://example.com",
+            },
+          ],
+          "x-payment-info": {
+            protocols: ["x402"],
+            price: { mode: "fixed", currency: "USD", amount: PRICE.slice(1) },
+          },
+          responses: {
+            200: {
+              description: "Extracted content",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["url", "markdown", "wordCount"],
+                    properties: {
+                      url: { type: "string", description: "Final URL after redirects" },
+                      title: { type: ["string", "null"] },
+                      byline: { type: ["string", "null"] },
+                      excerpt: { type: ["string", "null"] },
+                      markdown: { type: "string", description: "Main content as markdown" },
+                      wordCount: { type: "integer" },
+                    },
+                  },
+                  example: EXAMPLE_OUTPUT,
+                },
+              },
+            },
+            400: { description: "Missing or invalid `url` (not charged)" },
+            402: { description: "Payment Required (x402 challenge in the PAYMENT-REQUIRED header)" },
+            502: { description: "Target site could not be fetched (not charged)" },
+          },
+        },
+      },
+    },
+  });
+});
+
+const wellKnown = (req, res) =>
+  res.json({
+    version: 1,
+    resources: [`${publicBase(req)}/extract`],
+    instructions: `GET /extract?url=<absolute http(s) URL>. ${PRICE} USDC per successful call via x402. See /openapi.json and /llms.txt.`,
+  });
+app.get("/.well-known/x402", wellKnown);
+app.get("/.well-known/x402.json", wellKnown);
+
+app.get("/robots.txt", (req, res) =>
+  res.type("text/plain").send(`User-agent: *\nAllow: /\nDisallow: /extract\n\n# Agents: see ${publicBase(req)}/llms.txt and ${publicBase(req)}/openapi.json\n`),
+);
 
 app.use(
   paymentMiddleware(
