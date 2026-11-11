@@ -64,7 +64,7 @@ With `NETWORK=base-sepolia` (the default) no keys are needed and payments use te
 |---|---|---|
 | `PAY_TO` | required | Wallet address that receives payments |
 | `NETWORK` | `base-sepolia` | `base-sepolia` (test) or `base` (real USDC) |
-| `PRICE` | `$0.005` | Price per successful `/extract` call |
+| `PRICE_EXTRACT` | `$0.005` | Price per successful `/extract` call |
 | `PRICE_LIGHT` | `$0.002` | Price per successful `/metadata` or `/links` call |
 | `CDP_API_KEY_ID`, `CDP_API_KEY_SECRET` | none | Required when `NETWORK=base` |
 | `FACILITATOR_URL` | none | Use a different x402 facilitator instead |

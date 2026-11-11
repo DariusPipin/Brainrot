@@ -22,7 +22,8 @@ const NETWORKS = {
 const PORT = Number(process.env.PORT || 4021);
 const PAY_TO = (process.env.PAY_TO || "").trim();
 const NETWORK = (process.env.NETWORK || "base-sepolia").trim();
-const PRICE = (process.env.PRICE || "$0.005").trim();
+// Named PRICE_EXTRACT (not PRICE) so a stale PRICE value saved on the host is ignored.
+const PRICE = (process.env.PRICE_EXTRACT || "$0.005").trim();
 const PRICE_LIGHT = (process.env.PRICE_LIGHT || "$0.002").trim();
 const { CDP_API_KEY_ID, CDP_API_KEY_SECRET, FACILITATOR_URL } = process.env;
 // Public, non-secret key that proves site ownership to IndexNow search engines.
@@ -36,7 +37,7 @@ function fail(msg) {
 if (!/^0x[0-9a-fA-F]{40}$/.test(PAY_TO)) fail("PAY_TO must be your wallet address (0x + 40 hex characters). Payments are sent there.");
 if (/^0x0{40}$/.test(PAY_TO)) fail("PAY_TO is the zero address; money sent there is lost.");
 if (!NETWORKS[NETWORK]) fail(`NETWORK must be one of: ${Object.keys(NETWORKS).join(", ")}`);
-for (const [k, v] of [["PRICE", PRICE], ["PRICE_LIGHT", PRICE_LIGHT]]) {
+for (const [k, v] of [["PRICE_EXTRACT", PRICE], ["PRICE_LIGHT", PRICE_LIGHT]]) {
   if (!/^\$\d+(\.\d+)?$/.test(v) || Number(v.slice(1)) <= 0) fail(`${k} must look like "$0.01".`);
 }
 

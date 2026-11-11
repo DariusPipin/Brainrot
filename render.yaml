@@ -7,7 +7,7 @@ services:
     envVars:
       - key: NETWORK
         value: base
-      - key: PRICE
+      - key: PRICE_EXTRACT
         value: $0.005
       - key: PRICE_LIGHT
         value: $0.002

@@ -58,7 +58,7 @@ await check("metadata and links work on a live page", async () => {
 const PORT = 4599;
 const PAY_TO = "0x1111111111111111111111111111111111111111";
 const server = spawn(process.execPath, ["src/server.js"], {
-  env: { ...process.env, PORT: String(PORT), PAY_TO, NETWORK: "base-sepolia", PRICE: "$0.01", FACILITATOR_URL: "", CDP_API_KEY_ID: "", CDP_API_KEY_SECRET: "" },
+  env: { ...process.env, PORT: String(PORT), PAY_TO, NETWORK: "base-sepolia", PRICE_EXTRACT: "$0.01", FACILITATOR_URL: "", CDP_API_KEY_ID: "", CDP_API_KEY_SECRET: "" },
   stdio: ["ignore", "pipe", "pipe"],
 });
 let log = "";
